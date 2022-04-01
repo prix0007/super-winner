@@ -1,7 +1,19 @@
 import logo from './logo.svg';
 import './App.css';
 
+import { useEffect} from "react";
+import {Chessboard} from './chessboard';
+
 function App() {
+
+  useEffect(() => {
+    const nb = new Chessboard(4).generate_new_board();
+ 
+    console.log(nb.generate_random_queens())
+    console.log(nb.display());
+    console.log(nb.find_attacking_pairs());
+  }, [])
+
   return (
     <div className="App">
       <header className="App-header">
