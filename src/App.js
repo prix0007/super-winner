@@ -1,46 +1,126 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
 
-import { useEffect, useState} from "react";
-import {Chessboard} from './chessboard';
+import React, { useEffect, useState } from "react";
+import { Chessboard } from "./chessboard";
 
 function App() {
+  const [curState, setCurState] = useState();
+  const [nextState, setNextState] = useState();
 
-  const [chessboard, setChessboard] = useState();
+  const [currentIter, setIter] = useState(0);
+  const [currentHVal, setHVal] = useState(99999999);
+
+  const [boardSize, setBoardSize] = useState(4);
+
+  const [speed, setSpeed] = useState(1000);
 
   useEffect(() => {
-    const nb = new Chessboard(4).generate_new_board();
- 
-    console.log(nb.generate_random_queens())
-    console.log(nb.display());
-    console.log(nb.find_attacking_pairs());
-    setChessboard(nb);
-  }, [])
+    // Generate a new Board
+    const nb = new Chessboard(boardSize)
+      .generate_new_board()
+      .generate_random_queens();
+
+    setHVal(nb.find_attacking_pairs().length);
+    setCurState(nb);
+
+    // }
+  }, []);
+
+  React.useEffect(() => {
+    var iteration = setInterval(() => {
+      // All Update Code here.
+      if (currentHVal > 0) {
+        const next = new Chessboard(boardSize)
+          .generate_new_board()
+          .generate_random_queens();
+        const newHVal = next.find_attacking_pairs().length;
+        setNextState(next);
+
+        // console.log(currentHVal);
+        // console.log(next.find_attacking_pairs().length);
+
+        if (newHVal < currentHVal) {
+          console.log("Found a better state.");
+          setHVal(newHVal);
+          setCurState(next);
+        }
+        setIter(iter => iter + 1);
+      }
+      
+    }, speed);
+
+    return function cleanup() {
+      clearInterval(iteration);
+    };
+  });
+
+  const handleBoardSizeChange = (e) => {
+    if (e.target.value > 0) {
+      setBoardSize(parseInt(e.target.value));
+      const nb = new Chessboard(e.target.value)
+        .generate_new_board()
+        .generate_random_queens();
+
+      setHVal(99999999);
+      setCurState(nb);
+    }
+  };
 
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        {chessboard && chessboard.display().map((row) => {
-          return row.map((e) => {
-            if(e === 0){
-              return <p>0</p>
-            } else {
-              return <p>{e.x}</p>
-            }
-          })
-        })}
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <h2>Stochastic Hill Climbing Algorithm</h2>
+        <p>Enter a Board Size:</p>
+        <input
+          type="number"
+          value={boardSize}
+          onChange={(e) => handleBoardSizeChange(e)}
+        />
+        <p>Current H value: {currentHVal}</p>
+        <p>I am speed: {speed / 1000} Secs per iter </p>
+        <p>Current Iteration: {currentIter}</p>
+        <input type="range" min="1" max="1000" value={speed} class="slider" onChange={(e) => {setSpeed(e.target.value)}}/>
+        <div className="main-wrapper">
+          <div>
+            <p>Current State</p>
+            <div className="wrapper">
+              {curState &&
+                curState.display().map((row) => {
+                  return (
+                    <div className="row">
+                      {row.map((e) => {
+                        if (e === 0) {
+                          return <p>0</p>;
+                        } else {
+                          return <p> Q </p>;
+                        }
+                      })}
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+          <div>
+            <p> Next State </p>
+            <div className="wrapper">
+              {nextState &&
+                nextState.display().map((row) => {
+                  return (
+                    <div className="row">
+                      {row.map((e) => {
+                        if (e === 0) {
+                          return <p>0</p>;
+                        } else {
+                          return <p> Q </p>;
+                        }
+                      })}
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        </div>
       </header>
     </div>
   );
