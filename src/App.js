@@ -64,6 +64,7 @@ function App() {
 
       setHVal(99999999);
       setCurState(nb);
+      setIter(0);
     }
   };
 
