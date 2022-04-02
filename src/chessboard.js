@@ -1,4 +1,4 @@
-class Chessboard {
+export default class Chessboard {
   board;
   size = 8;
 
@@ -169,6 +169,3 @@ class Queen {
   }
 }
 
-module.exports = {
-  Chessboard,
-};

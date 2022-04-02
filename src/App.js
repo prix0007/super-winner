@@ -2,7 +2,7 @@ import logo from "./logo.svg";
 import "./App.css";
 
 import React, { useEffect, useState } from "react";
-import { Chessboard } from "./chessboard";
+import Chessboard from "./chessboard";
 
 function App() {
   const [curState, setCurState] = useState();
