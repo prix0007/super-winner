@@ -79,7 +79,7 @@ function App() {
           onChange={(e) => handleBoardSizeChange(e)}
         />
         <p>Current H value: {currentHVal}</p>
-        <p>I am speed: {speed / 1000} Secs per iter </p>
+        <p>Current Iteration Speed: {speed / 1000} Secs per iter </p>
         <p>Current Iteration: {currentIter}</p>
         <input type="range" min="1" max="1000" value={speed} class="slider" onChange={(e) => {setSpeed(e.target.value)}}/>
         <div className="main-wrapper">
