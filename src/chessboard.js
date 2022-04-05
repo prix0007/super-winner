@@ -148,6 +148,42 @@ export default class Chessboard {
     return attacking;
   }
 
+  set_board(board) {
+    this.board = board;
+    return this
+  }
+
+  find_successor_states() {
+    // Move 1 along the col
+    // Fix all the queens 
+    // Every col will have this.size - 1 Successor state
+    // So total successor states wil be (this.size - 1)*(this.size)
+
+    let all_successor_states = [];
+
+    for(let i = 0; i<this.size; ++i) {
+      
+      for(let j=0; j<this.size; ++j) {
+        
+        if(this.board[j][i] === 0) {
+          let copy = [];
+          this.board.forEach((l) => {
+            copy.push([...l])
+          })
+          
+          for(let k =0; k < this.size ; ++k){
+            copy[k][i] = 0;
+          }
+          copy[j][i] = new Queen(j, i);
+          all_successor_states.push(copy);
+        }
+        
+      }
+    }
+
+    return all_successor_states;
+
+  }
 
   display() {
     return this.board;

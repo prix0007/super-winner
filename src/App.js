@@ -15,15 +15,57 @@ function App() {
 
   const [speed, setSpeed] = useState(1000);
 
+  // Make sure cur state is a instance of `Chess` class
+  const find_next_state = (curState) => {
+    let states = curState.find_successor_states();
+
+    let fin_states = [];
+    states.forEach((b) => {
+      let x = new Chessboard(boardSize).generate_new_board();
+      x.set_board(b);
+      let a_pairs = x.find_attacking_pairs();
+
+      fin_states.push({
+        board: b,
+        h_val: a_pairs.length,
+      });
+    });
+
+    // Sorting through h-values
+    let s_fin_val = fin_states.sort((a, b) => a.h_val - b.h_val);
+
+    let l_h_val = s_fin_val[0].h_val;
+
+    let small_h_val_s_states = s_fin_val.filter((x) => {
+      return x.h_val === l_h_val;
+    });
+    console.log(s_fin_val);
+    console.log(small_h_val_s_states);
+
+    let r_val = 0;
+    if (small_h_val_s_states.length > 1) {
+      r_val = Math.floor(Math.random() * small_h_val_s_states.length);
+    }
+
+    console.log("Just before making next state", small_h_val_s_states[r_val]);
+    const nextState = new Chessboard(boardSize).set_board(
+      small_h_val_s_states[r_val].board
+    );
+
+    console.log(nextState);
+
+    return nextState;
+
+  };
+
   useEffect(() => {
     // Generate a new Board
     const nb = new Chessboard(boardSize)
       .generate_new_board()
-      .generate_random_queens();
+      .generate_random_queens();  
 
     setHVal(nb.find_attacking_pairs().length);
     setCurState(nb);
-
     // }
   }, []);
 
@@ -31,9 +73,7 @@ function App() {
     var iteration = setInterval(() => {
       // All Update Code here.
       if (currentHVal > 0) {
-        const next = new Chessboard(boardSize)
-          .generate_new_board()
-          .generate_random_queens();
+        const next = find_next_state(curState);
         const newHVal = next.find_attacking_pairs().length;
         setNextState(next);
 
@@ -45,9 +85,8 @@ function App() {
           setHVal(newHVal);
           setCurState(next);
         }
-        setIter(iter => iter + 1);
+        setIter((iter) => iter + 1);
       }
-      
     }, speed);
 
     return function cleanup() {
@@ -72,16 +111,33 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h2>Stochastic Hill Climbing Algorithm</h2>
-        <p>Enter a Board Size:</p>
-        <input
-          type="number"
-          value={boardSize}
-          onChange={(e) => handleBoardSizeChange(e)}
-        />
-        <p>Current H value: {currentHVal}</p>
-        <p>Current Iteration Speed: {speed / 1000} Secs per iter </p>
-        <p>Current Iteration: {currentIter}</p>
-        <input type="range" min="1" max="1000" value={speed} class="slider" onChange={(e) => {setSpeed(e.target.value)}}/>
+        <div className="flex-row" style={{ width: "auto" }}>
+          <p>Enter a Board Size:</p>
+          <input
+            style={{
+              marginLeft: 20,
+            }}
+            type="number"
+            value={boardSize}
+            onChange={(e) => handleBoardSizeChange(e)}
+          />
+        </div>
+        <p>Current Attacking Queen Pairs: {currentHVal}</p>
+
+        <p>Current Number: {currentIter}</p>
+        <div className="flex-row">
+          <p>Current Delay Speed: {speed / 1000} sec delay per round </p>
+          <input
+            type="range"
+            min="1"
+            max="1000"
+            value={speed}
+            class="slider"
+            onChange={(e) => {
+              setSpeed(e.target.value);
+            }}
+          />
+        </div>
         <div className="main-wrapper">
           <div>
             <p>Current State</p>
@@ -92,9 +148,9 @@ function App() {
                     <div className="row">
                       {row.map((e) => {
                         if (e === 0) {
-                          return <p>0</p>;
+                          return <p></p>;
                         } else {
-                          return <p> Q </p>;
+                          return <p className="queen"> Q </p>;
                         }
                       })}
                     </div>
@@ -111,9 +167,9 @@ function App() {
                     <div className="row">
                       {row.map((e) => {
                         if (e === 0) {
-                          return <p>0</p>;
+                          return <p> </p>;
                         } else {
-                          return <p> Q </p>;
+                          return <p className="queen"> Q </p>;
                         }
                       })}
                     </div>
