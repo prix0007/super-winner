@@ -21,10 +21,12 @@ function App() {
   const [currentIter, setIter] = useState(0);
   const [currentHVal, setHVal] = useState(99999999);
   const [stop, setStop] = useState(false);
+  const [startState, setStartState] = useState();
 
   const [boardSize, setBoardSize] = useState(8);
 
   const [speed, setSpeed] = useState(1000);
+  const [isSolved, setSolved] = useState(false);
 
   // Make sure cur state is a instance of `Chess` class
   const find_next_state = (curState) => {
@@ -78,6 +80,7 @@ function App() {
 
     setHVal(nb.find_attacking_pairs().length);
     setCurState(nb);
+    setStartState(nb);
     // }
   }, []);
 
@@ -108,6 +111,7 @@ function App() {
       }
       if (currentHVal === 0) {
         setStop(true);
+        setSolved(true);
       }
     }, speed);
 
@@ -133,6 +137,8 @@ function App() {
           attack_pair: xx.find_attacking_pairs().length,
         },
       ]);
+      setStartState(xx);
+      setSolved(false);
     }
   };
 
@@ -140,17 +146,51 @@ function App() {
 
   return (
     <div className="App">
+      {isSolved && (
+        <div class="dialog overflow-main" role="dialog">
+          <div className=" d-flex flex-column justify-content-center align-items-center">
+            <button
+              type="button"
+              class="close btn btn-danger"
+              onClick={() =>
+                handleBoardSizeChange({ target: { value: boardSize } })
+              }
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <p>
+              {boardSize} Queens has been solved. No one is Attacking anyone.
+            </p>
+            <p className="text-primary">Solved State</p>
+            <div className="d-flex ">
+              {nextState &&
+                nextState.display().map((row) => {
+                  return (
+                    <div className="m-0">
+                      {row.map((e) => {
+                        if (e === 0) {
+                          return <div style={{height: 50, width: 50, background: "white", border:"1px solid #ccc"}}> </div>;
+                        } else {
+                          return <div className="queen d-flex justify-content-center align-items-center" style={{height: 50, width: 50, border:"1px solid #ccc"}}> Q </div>;
+                        }
+                      })}
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        </div>
+      )}
       <header className="App-header">
         <h2 className="h2 mb-5">Stochastic Hill Climbing Algorithm</h2>
-        <div className="d-flex" style={{justifyContent: "space-between"}}>
+        <div className="d-flex" style={{ justifyContent: "space-between" }}>
           <div className="px-5">
             <LineChart width={600} height={300} data={data}>
               <Line type="monotone" dataKey="attack_pair" stroke="#8884d8" />
-              
-              <XAxis dataKey="name" name="Iterations for Algo" fontSize={10}/>
-              <YAxis name="Attacking Queen Pairs" fontSize={12}/>
+
+              <XAxis dataKey="name" name="Iterations for Algo" fontSize={10} />
+              <YAxis name="Attacking Queen Pairs" fontSize={12} />
               <Tooltip />
-              
             </LineChart>
           </div>
           <div>
@@ -167,9 +207,13 @@ function App() {
                 onChange={(e) => handleBoardSizeChange(e)}
               />
             </div>
-            <p className="h4 text-start">Current Attacking Queen Pairs: {currentHVal}</p>
+            <p className="h4 text-start">
+              Current Attacking Queen Pairs: {currentHVal}
+            </p>
 
-            <p className="h4 mb-3 text-start">Current Round Number: {currentIter}</p>
+            <p className="h4 mb-3 text-start">
+              Current Round Number: {currentIter}
+            </p>
             <div className="d-flex">
               <p className="text-secondary h6 me-2">
                 Current Delay Speed: {speed / 1000} sec delay per round{" "}
@@ -205,10 +249,10 @@ function App() {
         </div>
         <div className="main-wrapper">
           <div>
-            <p>Current State</p>
+            <p>Start State</p>
             <div className="wrapper">
-              {curState &&
-                curState.display().map((row) => {
+              {startState &&
+                startState.display().map((row) => {
                   return (
                     <div className="m-0">
                       {row.map((e) => {
@@ -224,7 +268,7 @@ function App() {
             </div>
           </div>
           <div>
-            <p> Next State </p>
+            <p> Current State </p>
             <div className="wrapper">
               {nextState &&
                 nextState.display().map((row) => {

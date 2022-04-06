@@ -46,3 +46,28 @@ code {
 .queen {
   background-color: red !important;
 }
+
+.overflow-main {
+  position: fixed;
+  background-color: rgba(0,0,0,0.9);
+  height: 100vh;
+  width: 100vw;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.overflow-main p {
+  font-size: 2rem;
+  color: #fff;
+}
+
+.overflow-main button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
